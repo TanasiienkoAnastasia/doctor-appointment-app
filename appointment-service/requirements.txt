@@ -1,0 +1,3 @@
+# appointment-service/requirements.txt
+flask
+flask_sqlalchemy
