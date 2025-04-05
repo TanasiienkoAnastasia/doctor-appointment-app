@@ -1,5 +1,5 @@
 # auth-service/app/models.py
-from app import db
+from app.extesions import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

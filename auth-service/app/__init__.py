@@ -4,6 +4,7 @@ import os
 from app.routes import auth_routes
 from flask_sqlalchemy import SQLAlchemy
 from app.models import User
+from app.extesions import db
 
 
 # Ініціалізація бази даних
