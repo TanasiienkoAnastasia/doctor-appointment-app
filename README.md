@@ -41,6 +41,7 @@
 ```bash
 git clone https://github.com/your-username/doctor-appointment-app.git
 cd doctor-appointment-app
+<<<<<<< HEAD
 ```
 
 2. Запуск усіх мікросервісів:
@@ -98,3 +99,5 @@ doctor-appointment-app/
 ## 🔗 Посилання
 
 - [GPTOnline.ai/ru](https://gptonline.ai/ru/) — AI-помічник для Python, Docker, мікросервісів (українською)
+=======
+>>>>>>> origin/main
