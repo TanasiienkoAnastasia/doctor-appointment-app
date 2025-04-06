@@ -16,6 +16,7 @@ def health_check():
     return jsonify({'status': 'OK'}), 200
 
 
+users_db = {}
 
 @auth_routes.route('/register', methods=['POST'])
 def register():
