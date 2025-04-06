@@ -7,6 +7,14 @@ auth_routes = Blueprint('auth_routes', __name__)
 import jwt
 import datetime
 import os
+from flask import Blueprint, jsonify
+
+health_bp = Blueprint('health', __name__)
+
+@health_bp.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'OK'}), 200
+
 
 
 @auth_routes.route('/register', methods=['POST'])

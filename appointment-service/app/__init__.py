@@ -1,9 +1,7 @@
-# appointment-service/app/__init__.py
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from app.extensions import db
+from app.routes import appointment_routes, health_bp
 import os
-
-db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
@@ -12,8 +10,8 @@ def create_app():
 
     db.init_app(app)
 
-    from app.routes import appointment_routes
     app.register_blueprint(appointment_routes)
+    app.register_blueprint(health_bp)
 
     with app.app_context():
         from app import models

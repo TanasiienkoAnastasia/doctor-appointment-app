@@ -1,5 +1,14 @@
 from flask import Blueprint, request, jsonify
 
+from flask import Blueprint, jsonify
+
+health_bp = Blueprint('health_bp', __name__)
+
+@health_bp.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "OK", "service": "notification-service"}), 200
+
+
 notify_routes = Blueprint('notify_routes', __name__)
 
 @notify_routes.route('/', methods=['GET'])

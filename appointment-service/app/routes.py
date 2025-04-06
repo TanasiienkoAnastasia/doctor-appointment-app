@@ -3,6 +3,14 @@ from flask import Blueprint, request, jsonify
 from app.models import Appointment
 from app import db
 from datetime import datetime
+from flask import Blueprint, jsonify
+
+health_bp = Blueprint('health_bp', __name__)
+
+@health_bp.route('/health', methods=['GET'])
+def health():
+    return jsonify(status="OK"), 200
+
 
 appointment_routes = Blueprint('appointment_routes', __name__)
 

@@ -1,6 +1,14 @@
 from flask import Blueprint, request, jsonify
 from app.models import DoctorSchedule
 from app import db
+from flask import Blueprint, jsonify
+
+health_bp = Blueprint('health_bp', __name__)
+
+@health_bp.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "OK", "service": "schedule-service"}), 200
+
 
 schedule_routes = Blueprint('schedule_routes', __name__)
 

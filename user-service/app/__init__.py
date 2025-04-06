@@ -1,10 +1,7 @@
-# user-service/app/__init__.py
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from app.extensions import db  # нове джерело db
+from app.routes import user_routes, health_bp
 import os
-
-# Ініціалізація бази даних
-db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
@@ -13,8 +10,8 @@ def create_app():
 
     db.init_app(app)
 
-    from app.routes import user_routes
     app.register_blueprint(user_routes)
+    app.register_blueprint(health_bp)
 
     with app.app_context():
         from app import models

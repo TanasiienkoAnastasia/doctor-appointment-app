@@ -1,8 +1,7 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from app.extensions import db
+from app.routes import medical_routes, health_bp
 import os
-
-db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
@@ -11,8 +10,8 @@ def create_app():
 
     db.init_app(app)
 
-    from app.routes import medical_routes
-    app.register_blueprint(medical_routes)
+    app.register_blueprint(medical_routes)  # якщо є маршрути
+    app.register_blueprint(health_bp)       # 🩺 health-check
 
     with app.app_context():
         from app import models
