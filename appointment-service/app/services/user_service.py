@@ -1,6 +1,5 @@
-from app.models import User
+from app.models.user import User
 from app.schemas import UserSchema
-
 
 class UserService:
     @staticmethod

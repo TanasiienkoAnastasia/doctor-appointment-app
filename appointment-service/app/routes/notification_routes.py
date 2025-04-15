@@ -2,10 +2,6 @@ from flask import Blueprint, request, jsonify
 
 notification_routes = Blueprint('notify_routes', __name__)
 
-@notification_routes.route('/', methods=['GET'])
-def index():
-    return jsonify({"message": "Notification Service is running"}), 200
-
 @notification_routes.route('/notify', methods=['POST'])
 def send_notification():
     data = request.get_json()

@@ -2,9 +2,8 @@ import datetime
 import jwt
 import os
 from werkzeug.security import check_password_hash
-from app.models import User
+from app.models.user import User
 from app.extensions import db
-
 
 class AuthService:
     @staticmethod

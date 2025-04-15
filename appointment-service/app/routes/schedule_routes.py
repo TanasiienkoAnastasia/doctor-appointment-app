@@ -1,12 +1,8 @@
 from flask import Blueprint, request, jsonify
-from app.models import DoctorSchedule
+from app.models.doctor_schedule import DoctorSchedule
 from app import db
 
 schedule_routes = Blueprint('schedule_routes', __name__)
-
-@schedule_routes.route('/')
-def index():
-    return jsonify({"message": "Schedule Service is running"})
 
 @schedule_routes.route('/schedule', methods=['POST'])
 def add_schedule():

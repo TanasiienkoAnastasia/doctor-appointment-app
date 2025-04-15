@@ -4,10 +4,6 @@ from app import db
 
 medical_records_routes = Blueprint('medical_routes', __name__)
 
-@medical_records_routes.route('/', methods=['GET'])
-def index():
-    return jsonify({'message': 'Medical Records Service is running'}), 200
-
 @medical_records_routes.route('/records', methods=['POST'])
 def create_record():
     data = request.get_json()
