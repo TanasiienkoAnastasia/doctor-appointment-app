@@ -7,11 +7,18 @@ from app.routes.user_routes import user_routes
 from app.routes.medical_records_routes import medical_records_routes
 from app.routes.schedule_routes import schedule_routes
 from flask_cors import CORS
+from swagger_gen.swagger import Swagger
 import os
 
 def create_app():
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": "*"}})
+
+    swagger = Swagger(
+        app=app,
+        title='app'
+    )
+    swagger.configure()
 
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')

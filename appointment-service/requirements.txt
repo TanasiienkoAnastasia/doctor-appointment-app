@@ -22,4 +22,7 @@ pyjwt
 flask-cors
 werkzeug
 marshmallow
+flask-swagger==0.2.14
+flask-swagger-ui==4.11.1
+swagger-gen==0.1.2
 

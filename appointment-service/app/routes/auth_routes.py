@@ -3,9 +3,14 @@ from marshmallow import ValidationError
 from app.schemas import LoginRequestSchema, RegisterRequestSchema, UserSchema
 from app.services.auth_service import AuthService
 from app.utils.response_utils import success, error
+from swagger_gen.lib.wrappers import swagger_metadata
 
 auth_routes = Blueprint('auth_routes', __name__)
 
+@swagger_metadata(
+    summary='Register endpoint',
+    description='This is a register endpoint'
+)
 @auth_routes.route('/register', methods=['POST'])
 def register():
     schema = RegisterRequestSchema()
