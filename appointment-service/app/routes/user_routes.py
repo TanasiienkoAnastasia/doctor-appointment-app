@@ -1,12 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app.models import UserProfile
 from app import db
 
 user_routes = Blueprint('user_routes', __name__)
-
-@user_routes.route('/', methods=['GET'])
-def index():
-    return jsonify({'message': 'User Service is running'}), 200
 
 @user_routes.route('/users', methods=['POST'])
 def create_user():

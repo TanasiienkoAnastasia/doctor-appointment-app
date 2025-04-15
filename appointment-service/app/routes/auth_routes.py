@@ -1,14 +1,15 @@
-from flask import Blueprint, request, jsonify
-from marshmallow import ValidationError
-from app.models import User
-from app.extensions import db
-import jwt
 import datetime
 import os
+import jwt
+from flask import Blueprint, request, jsonify
+from marshmallow import ValidationError
 from werkzeug.security import check_password_hash
+from app.extensions import db
+from app.models import User
 from app.schemas.login_schema import LoginRequestSchema
-from app.schemas.user_schema import UserSchema
 from app.schemas.register_schema import RegisterRequestSchema
+from app.schemas.user_schema import UserSchema
+from app.utils.jwt_utils import generate_token
 
 auth_routes = Blueprint('auth_routes', __name__)
 
@@ -48,20 +49,10 @@ def login():
     if not user or not check_password_hash(user.password, dto.password):
         return jsonify({'message': 'Невірний email або пароль'}), 401
 
-    access_exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
-    refresh_exp = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+    access_exp_delta = datetime.timedelta(minutes=15)
 
-    access_token = jwt.encode({
-        'email': user.email,
-        'userType': user.user_type,
-        'exp': access_exp
-    }, os.getenv('SECRET_KEY'), algorithm='HS256')
-
-    refresh_token = jwt.encode({
-        'email': user.email,
-        'type': 'refresh',
-        'exp': refresh_exp
-    }, os.getenv('SECRET_KEY'), algorithm='HS256')
+    access_token = generate_token({'email': user.email, 'userType': user.user_type}, access_exp_delta)
+    refresh_token = generate_token({'email': user.email, 'type': 'refresh'}, datetime.timedelta(days=7), token_type='refresh')
 
     user_schema = UserSchema()
     user_data = user_schema.dump(user)
@@ -69,7 +60,7 @@ def login():
     return jsonify({
         'access_token': access_token,
         'refresh_token': refresh_token,
-        'access_expires': access_exp.isoformat() + 'Z',
+        'access_expires': (datetime.datetime.utcnow() + access_exp_delta).isoformat() + 'Z',
         'user': user_data
     })
 
@@ -79,7 +70,7 @@ def refresh_token():
     token = data.get('refresh_token')
 
     try:
-        payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=['HS256'])
+        payload = jwt.decode(token, os.getenv('JWT_SECRET', 'jwt-default'), algorithms=['HS256'])
         if payload.get('type') != 'refresh':
             return jsonify({'message': 'Неправильний тип токена'}), 400
     except jwt.ExpiredSignatureError:
@@ -87,14 +78,10 @@ def refresh_token():
     except jwt.InvalidTokenError:
         return jsonify({'message': 'Невалідний токен'}), 400
 
-    access_exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
-    new_access_token = jwt.encode({
-        'email': payload['email'],
-        'userType': payload['userType'],
-        'exp': access_exp
-    }, os.getenv('SECRET_KEY'), algorithm='HS256')
+    access_exp_delta = datetime.timedelta(minutes=15)
+    new_access_token = generate_token({'email': payload['email'], 'userType': payload['userType']}, access_exp_delta)
 
     return jsonify({
         'access_token': new_access_token,
-        'access_expires': access_exp.isoformat() + 'Z'
+        'access_expires': (datetime.datetime.utcnow() + access_exp_delta).isoformat() + 'Z'
     })
