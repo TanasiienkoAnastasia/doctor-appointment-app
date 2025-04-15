@@ -21,18 +21,10 @@ def register():
     except ValidationError as err:
         return jsonify({'errors': err.messages}), 400
 
-    existing_user = User.query.filter_by(email=dto.email).first()
-    if existing_user:
+    if User.query.filter_by(email=dto.email).first():
         return jsonify({'message': 'Користувач вже існує'}), 400
 
-    hashed_password = generate_password_hash(dto.password)
-
-    new_user = User(
-        username=dto.name,
-        email=dto.email,
-        password=hashed_password,
-        user_type=dto.user_type
-    )
+    new_user = dto.to_model()
 
     db.session.add(new_user)
     db.session.commit()
