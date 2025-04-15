@@ -17,7 +17,7 @@ auth_routes = Blueprint('auth_routes', __name__)
 def register():
     schema = RegisterRequestSchema()
     try:
-        dto = schema.load(request.get_json())  # ⬅️ отримаємо RegisterRequestDTO
+        dto = schema.load(request.get_json())
     except ValidationError as err:
         return jsonify({'errors': err.messages}), 400
 
@@ -48,17 +48,14 @@ def register():
 @auth_routes.route('/login', methods=['POST'])
 def login():
     schema = LoginRequestSchema()
-    json_data = request.get_json()
+    try:
+        dto = schema.load(request.get_json())
+    except ValidationError as err:
+        return jsonify({'errors': err.messages}), 400
 
-    errors = schema.validate(json_data)
-    if errors:
-        return jsonify({'errors': errors}), 400
+    user = User.query.filter_by(email=dto.email).first()
 
-    email = json_data['email']
-    password = json_data['password']
-
-    user = User.query.filter_by(email=email).first()
-    if not user or not check_password_hash(user.password, password):
+    if not user or not check_password_hash(user.password, dto.password):
         return jsonify({'message': 'Невірний email або пароль'}), 401
 
     token_payload = {
