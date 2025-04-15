@@ -1,6 +1,5 @@
 import os
 from functools import wraps
-
 import jwt
 from flask import request, jsonify
 
@@ -17,7 +16,10 @@ def role_required(required_role):
                 payload = jwt.decode(token.split(" ")[1], os.getenv('JWT_SECRET'), algorithms=['HS256'])
                 if payload['userType'] != required_role:
                     return jsonify({'message': 'Недостатньо прав'}), 403
-            except:
+
+            except jwt.ExpiredSignatureError:
+                return jsonify({'message': 'Токен протерміновано'}), 401
+            except jwt.InvalidTokenError:
                 return jsonify({'message': 'Невалідний токен'}), 401
 
             return f(*args, **kwargs)
