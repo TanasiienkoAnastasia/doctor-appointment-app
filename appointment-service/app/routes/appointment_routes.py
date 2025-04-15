@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
+
+from app.guards.role_required import role_required
 from app.models import Appointment
 from app.extensions import db
 
@@ -9,6 +11,9 @@ appointment_routes = Blueprint('appointment_routes', __name__)
 def index():
     return jsonify({'message': 'Appointment Service is running'}), 200
 
+# example
+@role_required('doctor')
+#example of usage
 @appointment_routes.route('/appointments', methods=['POST'])
 def create_appointment():
     data = request.get_json()
