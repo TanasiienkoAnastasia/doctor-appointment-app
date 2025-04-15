@@ -5,53 +5,64 @@ import jwt
 import datetime
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.dto.user_dto import UserDTO
-from app.dto.register_request_dto import RegisterRequestDTO
-from app.dto.login_request_dto import LoginRequestDTO
+from app.schemas.login_schema import LoginRequestSchema
+from app.schemas.user_schema import UserSchema
+from app.schemas.register_schema import RegisterRequestSchema
 
 auth_routes = Blueprint('auth_routes', __name__)
 
 @auth_routes.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    dto = RegisterRequestDTO(data)
+    schema = RegisterRequestSchema()
+    json_data = request.get_json()
 
-    if not dto.is_valid():
-        return jsonify({'errors': dto.errors}), 400
+    errors = schema.validate(json_data)
+    if errors:
+        return jsonify({'errors': errors}), 400
 
-    existing_user = User.query.filter_by(email=dto.email).first()
+    username = json_data['name']
+    email = json_data['email']
+    password = json_data['password']
+    user_type = json_data['userType']
+
+    existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return jsonify({'message': 'Користувач вже існує'}), 400
 
-    hashed_password = generate_password_hash(dto.password)
+    hashed_password = generate_password_hash(password)
 
     new_user = User(
-        username=dto.username,
-        email=dto.email,
+        username=username,
+        email=email,
         password =hashed_password,
-        user_type=dto.user_type
+        user_type=user_type
     )
 
     db.session.add(new_user)
     db.session.commit()
 
-    user_dto = UserDTO.from_model(new_user)
+    user_schema = UserSchema()
+    user_data = user_schema.dump(new_user)
+
     return jsonify({
         'message': 'Реєстрація успішна',
-        'user': user_dto.to_dict()
+        'user': user_data
     }), 201
 
 @auth_routes.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    dto = LoginRequestDTO(data)
+    schema = LoginRequestSchema()
+    json_data = request.get_json()
 
-    if not dto.is_valid():
-        return jsonify({'errors': dto.errors}), 400
+    errors = schema.validate(json_data)
+    if errors:
+        return jsonify({'errors': errors}), 400
 
-    user = User.query.filter_by(email=dto.email).first()
+    email = json_data['email']
+    password = json_data['password']
 
-    if not user or not check_password_hash(user.password, dto.password):
+    user = User.query.filter_by(email=email).first()
+    if not user or not check_password_hash(user.password, password):
         return jsonify({'message': 'Невірний email або пароль'}), 401
 
     token_payload = {
@@ -61,10 +72,10 @@ def login():
     }
 
     token = jwt.encode(token_payload, os.getenv('SECRET_KEY'), algorithm='HS256')
-
-    user_dto = UserDTO.from_model(user)
+    user_schema = UserSchema()
+    user_data = user_schema.dump(user)
 
     return jsonify({
         'token': token,
-        'user': user_dto.to_dict()
+        'user': user_data
     })
