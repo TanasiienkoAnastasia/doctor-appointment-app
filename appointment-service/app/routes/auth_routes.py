@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from marshmallow import ValidationError
+
 from app.models import User
 from app.extensions import db
 import jwt
@@ -14,28 +16,22 @@ auth_routes = Blueprint('auth_routes', __name__)
 @auth_routes.route('/register', methods=['POST'])
 def register():
     schema = RegisterRequestSchema()
-    json_data = request.get_json()
+    try:
+        dto = schema.load(request.get_json())  # ⬅️ отримаємо RegisterRequestDTO
+    except ValidationError as err:
+        return jsonify({'errors': err.messages}), 400
 
-    errors = schema.validate(json_data)
-    if errors:
-        return jsonify({'errors': errors}), 400
-
-    username = json_data['name']
-    email = json_data['email']
-    password = json_data['password']
-    user_type = json_data['userType']
-
-    existing_user = User.query.filter_by(email=email).first()
+    existing_user = User.query.filter_by(email=dto.email).first()
     if existing_user:
         return jsonify({'message': 'Користувач вже існує'}), 400
 
-    hashed_password = generate_password_hash(password)
+    hashed_password = generate_password_hash(dto.password)
 
     new_user = User(
-        username=username,
-        email=email,
-        password =hashed_password,
-        user_type=user_type
+        username=dto.name,
+        email=dto.email,
+        password=hashed_password,
+        user_type=dto.user_type
     )
 
     db.session.add(new_user)
