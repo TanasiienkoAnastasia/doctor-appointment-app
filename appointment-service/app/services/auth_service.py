@@ -24,3 +24,53 @@ class AuthService:
         db.session.add(new_user)
         db.session.commit()
         return new_user
+
+    @staticmethod
+    def generate_token(data, expires_delta, token_type="access"):
+        payload = {**data, 'exp': datetime.datetime.utcnow() + expires_delta}
+        if token_type == 'refresh':
+            payload['type'] = 'refresh'
+        return jwt.encode(payload, os.getenv('JWT_SECRET', 'jwt-default'), algorithm='HS256')
+
+    @staticmethod
+    def generate_token_pair(user):
+        access_exp = datetime.timedelta(minutes=15)
+        refresh_exp = datetime.timedelta(days=7)
+
+        access_token = AuthService.generate_token({
+            'email': user.email,
+            'userType': user.user_type
+        }, access_exp)
+
+        refresh_token = AuthService.generate_token({
+            'email': user.email,
+            'userType': user.user_type
+        }, refresh_exp, token_type='refresh')
+
+        return {
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'access_expires': (datetime.datetime.utcnow() + access_exp).isoformat() + 'Z'
+        }
+
+    @staticmethod
+    def refresh_access_token(refresh_token):
+        try:
+            payload = jwt.decode(refresh_token, os.getenv('JWT_SECRET', 'jwt-default'), algorithms=['HS256'])
+            if payload.get('type') != 'refresh':
+                return None, 'Неправильний тип токена'
+        except jwt.ExpiredSignatureError:
+            return None, 'Термін дії токена вичерпано'
+        except jwt.InvalidTokenError:
+            return None, 'Невалідний токен'
+
+        access_exp = datetime.timedelta(minutes=15)
+        new_token = AuthService.generate_token({
+            'email': payload['email'],
+            'userType': payload['userType']
+        }, access_exp)
+
+        return {
+            'access_token': new_token,
+            'access_expires': (datetime.datetime.utcnow() + access_exp).isoformat() + 'Z'
+        }, None
