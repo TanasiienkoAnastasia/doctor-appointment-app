@@ -1,43 +1,47 @@
-from flask import Blueprint, request, jsonify
-from datetime import datetime
-from app.guards.role_required import role_required
-from app.models import Appointment
-from app.extensions import db
+from flask import Blueprint, request
+from marshmallow import ValidationError
+from app.utils import success, error
+from app.schemas import CreateAppointmentSchema, AppointmentSchema
+from app.services import AppointmentService
+from app.guards.jwt_required import jwt_required
 
 appointment_routes = Blueprint('appointment_routes', __name__)
 
-# example
-@role_required('doctor')
-#example of usage
+@jwt_required
 @appointment_routes.route('/appointments', methods=['POST'])
 def create_appointment():
-    data = request.get_json()
-    appointment = Appointment(
-        patient_id=data['patient_id'],
-        doctor_id=data['doctor_id'],
-        appointment_time=datetime.fromisoformat(data['appointment_time']),
-        status=data.get('status', 'scheduled')
-    )
-    db.session.add(appointment)
-    db.session.commit()
-    return jsonify(appointment.to_dict()), 201
+    schema = CreateAppointmentSchema()
+    try:
+        data = schema.load(request.get_json())
+    except ValidationError as err:
+        return error("Помилка валідації", err.messages)
 
+    appointment = AppointmentService.create_appointment(data)
+    return success("Прийом створено", AppointmentSchema().dump(appointment), status=201)
+
+@jwt_required
 @appointment_routes.route('/appointments', methods=['GET'])
 def get_appointments():
-    appointments = Appointment.query.all()
-    return jsonify([a.to_dict() for a in appointments])
+    appointments = AppointmentService.get_all()
+    return success(data=AppointmentSchema(many=True).dump(appointments))
 
+@jwt_required
 @appointment_routes.route('/appointments/<int:appointment_id>', methods=['PUT'])
 def update_appointment(appointment_id):
-    appointment = Appointment.query.get_or_404(appointment_id)
-    data = request.get_json()
-    appointment.status = data.get('status', appointment.status)
-    db.session.commit()
-    return jsonify(appointment.to_dict())
+    appointment = AppointmentService.get_by_id(appointment_id)
+    if not appointment:
+        return error("Прийом не знайдено", status=404)
 
+    data = request.get_json()
+    appointment = AppointmentService.update_appointment(appointment, data)
+    return success("Прийом оновлено", AppointmentSchema().dump(appointment))
+
+@jwt_required
 @appointment_routes.route('/appointments/<int:appointment_id>', methods=['DELETE'])
 def delete_appointment(appointment_id):
-    appointment = Appointment.query.get_or_404(appointment_id)
-    db.session.delete(appointment)
-    db.session.commit()
-    return jsonify({'message': 'Appointment deleted'})
+    appointment = AppointmentService.get_by_id(appointment_id)
+    if not appointment:
+        return error("Прийом не знайдено", status=404)
+
+    AppointmentService.delete_appointment(appointment)
+    return success("Прийом видалено")

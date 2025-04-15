@@ -1,9 +1,9 @@
 from flask import Blueprint, request
 from marshmallow import ValidationError
 from app.models import User
-from app.services.doctor_schedule_service import DoctorScheduleService
+from app.services import DoctorScheduleService
 from app.schemas import CreateScheduleSchema, DoctorScheduleSchema
-from app.utils.response_utils import success, error
+from app.utils import success, error
 from app.guards.jwt_required import jwt_required
 
 schedule_routes = Blueprint('schedule_routes', __name__)

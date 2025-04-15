@@ -1,6 +1,5 @@
 from flask import jsonify
 
-
 def success(message=None, data=None, status=200):
     response = {"success": True}
     if message:

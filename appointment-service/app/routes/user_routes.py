@@ -1,7 +1,7 @@
 from flask import Blueprint
 from app.guards.jwt_required import jwt_required
-from app.services.user_service import UserService
-from app.utils.response_utils import success, error
+from app.services import UserService
+from app.utils import success, error
 
 user_routes = Blueprint('user_routes', __name__)
 

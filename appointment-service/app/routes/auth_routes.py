@@ -1,8 +1,8 @@
 from flask import Blueprint, request
 from marshmallow import ValidationError
 from app.schemas import LoginRequestSchema, RegisterRequestSchema, UserSchema
-from app.services.auth_service import AuthService
-from app.utils.response_utils import success, error
+from app.services import AuthService
+from app.utils import success, error
 from swagger_gen.lib.wrappers import swagger_metadata
 
 auth_routes = Blueprint('auth_routes', __name__)
