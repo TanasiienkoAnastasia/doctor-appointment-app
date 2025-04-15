@@ -1,27 +1,34 @@
-from flask import Blueprint, request, jsonify
-from app.models.doctor_schedule import DoctorSchedule
-from app import db
+from flask import Blueprint, request
+from marshmallow import ValidationError
+from app.models import User
+from app.services.doctor_schedule_service import DoctorScheduleService
+from app.schemas import CreateScheduleSchema, DoctorScheduleSchema
+from app.utils.response_utils import success, error
+from app.guards.jwt_required import jwt_required
+from app.guards.role_required import role_required
 
 schedule_routes = Blueprint('schedule_routes', __name__)
 
 @schedule_routes.route('/schedule', methods=['POST'])
+@jwt_required
+@role_required('doctor')
 def add_schedule():
-    data = request.get_json()
-    schedule = DoctorSchedule(
-        doctor_id=data['doctor_id'],
-        weekday=data['weekday'],
-        start_time=data['start_time'],
-        end_time=data['end_time']
-    )
-    db.session.add(schedule)
-    db.session.commit()
-    return jsonify({"message": "Розклад додано"}), 201
+    schema = CreateScheduleSchema()
+    try:
+        data = schema.load(request.get_json())
+    except ValidationError as err:
+        return error("Помилка валідації", err.messages)
+
+    doctor_email = request.user.get("email")
+    doctor_id = User.query.filter_by(email=doctor_email).first().id
+
+    schedule = DoctorScheduleService.add_schedule(doctor_id, data)
+    schedule_data = DoctorScheduleSchema().dump(schedule)
+
+    return success("Розклад додано", schedule_data, status=201)
 
 @schedule_routes.route('/schedule/<int:doctor_id>', methods=['GET'])
 def get_schedule(doctor_id):
-    schedules = DoctorSchedule.query.filter_by(doctor_id=doctor_id).all()
-    return jsonify([{
-        'weekday': s.weekday,
-        'start_time': s.start_time.strftime('%H:%M'),
-        'end_time': s.end_time.strftime('%H:%M')
-    } for s in schedules])
+    schedules = DoctorScheduleService.get_schedule(doctor_id)
+    schedule_data = DoctorScheduleSchema(many=True).dump(schedules)
+    return success(data=schedule_data)

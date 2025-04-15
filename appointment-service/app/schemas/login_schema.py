@@ -5,6 +5,9 @@ class LoginRequestSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True, validate=validate.Length(min=6))
 
+    class Meta:
+        ordered = True
+
     @post_load
     def make_dto(self, data, **kwargs):
         return LoginRequestDTO(**data)

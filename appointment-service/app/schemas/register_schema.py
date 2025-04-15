@@ -7,6 +7,9 @@ class RegisterRequestSchema(Schema):
     password = fields.String(required=True, validate=validate.Length(min=6))
     userType = fields.String(required=True, validate=validate.OneOf(["patient", "doctor"]))
 
+    class Meta:
+        ordered = True
+
     @post_load
     def make_dto(self, data, **kwargs):
         return RegisterRequestDTO(**data)
