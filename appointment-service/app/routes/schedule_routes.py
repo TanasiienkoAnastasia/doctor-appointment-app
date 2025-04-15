@@ -5,13 +5,11 @@ from app.services.doctor_schedule_service import DoctorScheduleService
 from app.schemas import CreateScheduleSchema, DoctorScheduleSchema
 from app.utils.response_utils import success, error
 from app.guards.jwt_required import jwt_required
-from app.guards.role_required import role_required
 
 schedule_routes = Blueprint('schedule_routes', __name__)
 
-@schedule_routes.route('/schedule', methods=['POST'])
 @jwt_required
-@role_required('doctor')
+@schedule_routes.route('/schedule', methods=['POST'])
 def add_schedule():
     schema = CreateScheduleSchema()
     try:
@@ -27,6 +25,7 @@ def add_schedule():
 
     return success("Розклад додано", schedule_data, status=201)
 
+@jwt_required
 @schedule_routes.route('/schedule/<int:doctor_id>', methods=['GET'])
 def get_schedule(doctor_id):
     schedules = DoctorScheduleService.get_schedule(doctor_id)
