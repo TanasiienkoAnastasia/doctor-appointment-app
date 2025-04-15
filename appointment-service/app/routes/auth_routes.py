@@ -6,35 +6,35 @@ import datetime
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.dto.user_dto import UserDTO
+from app.dto.register_request_dto import RegisterRequestDTO
 
 auth_routes = Blueprint('auth_routes', __name__)
 
 @auth_routes.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    username = data.get('name')
-    email = data.get('email')
-    password = data.get('password')
-    user_type = data.get('userType')
+    dto = RegisterRequestDTO(data)
 
-    existing_user = User.query.filter_by(email=email).first()
+    if not dto.is_valid():
+        return jsonify({'errors': dto.errors}), 400
+
+    existing_user = User.query.filter_by(email=dto.email).first()
     if existing_user:
         return jsonify({'message': 'Користувач вже існує'}), 400
 
-    hashed_password = generate_password_hash(password)
+    hashed_password = generate_password_hash(dto.password)
 
     new_user = User(
-        username=username,
-        email=email,
+        username=dto.username,
+        email=dto.email,
         password =hashed_password,
-        user_type=user_type
+        user_type=dto.user_type
     )
 
     db.session.add(new_user)
     db.session.commit()
 
     user_dto = UserDTO.from_model(new_user)
-
     return jsonify({
         'message': 'Реєстрація успішна',
         'user': user_dto.to_dict()
