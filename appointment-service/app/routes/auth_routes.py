@@ -4,6 +4,7 @@ from app.extensions import db
 import jwt
 import datetime
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_routes = Blueprint('auth_routes', __name__)
 
@@ -19,10 +20,12 @@ def register():
     if existing_user:
         return jsonify({'message': 'Користувач вже існує'}), 400
 
+    hashed_password = generate_password_hash(password)
+
     new_user = User(
         username=username,
         email=email,
-        password=password,  # 🔐 можна додати хешування
+        password =hashed_password,
         user_type=user_type
     )
 
@@ -39,7 +42,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
 
-    if not user or user.password != password:
+    if not user or not check_password_hash(user.password, password):
         return jsonify({'message': 'Невірний email або пароль'}), 401
 
     token_payload = {

@@ -20,4 +20,5 @@ flask
 flask_sqlalchemy
 pyjwt
 flask-cors
+werkzeug
 
