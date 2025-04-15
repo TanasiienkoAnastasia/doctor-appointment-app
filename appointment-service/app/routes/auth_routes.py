@@ -5,6 +5,7 @@ import jwt
 import datetime
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.dto.user_dto import UserDTO
 
 auth_routes = Blueprint('auth_routes', __name__)
 
@@ -32,7 +33,12 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message': 'Реєстрація успішна'}), 201
+    user_dto = UserDTO.from_model(new_user)
+
+    return jsonify({
+        'message': 'Реєстрація успішна',
+        'user': user_dto.to_dict()
+    }), 201
 
 @auth_routes.route('/login', methods=['POST'])
 def login():
@@ -53,4 +59,9 @@ def login():
 
     token = jwt.encode(token_payload, os.getenv('SECRET_KEY'), algorithm='HS256')
 
-    return jsonify({'token': token})
+    user_dto = UserDTO.from_model(user)
+
+    return jsonify({
+        'token': token,
+        'user': user_dto.to_dict()
+    })
