@@ -1,8 +1,6 @@
 from flask import Blueprint, request
 from marshmallow import ValidationError
-from app.schemas.login_schema import LoginRequestSchema
-from app.schemas.register_schema import RegisterRequestSchema
-from app.schemas.user_schema import UserSchema
+from app.schemas import LoginRequestSchema, RegisterRequestSchema, UserSchema
 from app.services.auth_service import AuthService
 from app.utils.response_utils import success, error
 
