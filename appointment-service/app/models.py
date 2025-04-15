@@ -1,4 +1,12 @@
+from datetime import datetime
 from app.extensions import db
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    user_type = db.Column(db.String(50), nullable=False)
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -7,19 +15,6 @@ class Appointment(db.Model):
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
     status = db.Column(db.String(50), nullable=False)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-
-class UserProfile(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    full_name = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    role = db.Column(db.String(50), nullable=False)
-
 
 class MedicalRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
