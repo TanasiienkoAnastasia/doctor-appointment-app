@@ -3,13 +3,11 @@ import os
 import jwt
 from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
-from werkzeug.security import check_password_hash
-from app.extensions import db
-from app.models import User
 from app.schemas.login_schema import LoginRequestSchema
 from app.schemas.register_schema import RegisterRequestSchema
 from app.schemas.user_schema import UserSchema
 from app.utils.jwt_utils import generate_token
+from app.services.auth_service import AuthService
 
 auth_routes = Blueprint('auth_routes', __name__)
 
@@ -21,13 +19,10 @@ def register():
     except ValidationError as err:
         return jsonify({'errors': err.messages}), 400
 
-    if User.query.filter_by(email=dto.email).first():
+    if AuthService.is_email_taken(dto.email):
         return jsonify({'message': 'Користувач вже існує'}), 400
 
-    new_user = dto.to_model()
-
-    db.session.add(new_user)
-    db.session.commit()
+    new_user = AuthService.register_user(dto)
 
     user_schema = UserSchema()
     user_data = user_schema.dump(new_user)
@@ -45,8 +40,8 @@ def login():
     except ValidationError as err:
         return jsonify({'errors': err.messages}), 400
 
-    user = User.query.filter_by(email=dto.email).first()
-    if not user or not check_password_hash(user.password, dto.password):
+    user = AuthService.authenticate(dto.email, dto.password)
+    if not user:
         return jsonify({'message': 'Невірний email або пароль'}), 401
 
     access_exp_delta = datetime.timedelta(minutes=15)
