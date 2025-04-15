@@ -7,6 +7,7 @@ import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.dto.user_dto import UserDTO
 from app.dto.register_request_dto import RegisterRequestDTO
+from app.dto.login_request_dto import LoginRequestDTO
 
 auth_routes = Blueprint('auth_routes', __name__)
 
@@ -43,12 +44,14 @@ def register():
 @auth_routes.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
+    dto = LoginRequestDTO(data)
 
-    user = User.query.filter_by(email=email).first()
+    if not dto.is_valid():
+        return jsonify({'errors': dto.errors}), 400
 
-    if not user or not check_password_hash(user.password, password):
+    user = User.query.filter_by(email=dto.email).first()
+
+    if not user or not check_password_hash(user.password, dto.password):
         return jsonify({'message': 'Невірний email або пароль'}), 401
 
     token_payload = {
