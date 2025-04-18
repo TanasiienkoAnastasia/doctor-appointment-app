@@ -4,3 +4,9 @@ gateway/.idea/
 .idea/
 
 appointment-service/app/__pycache__/
+
+appointment-service/app/dto/__pycache__/
+
+appointment-service/app/guards/__pycache__/
+
+*.pyc

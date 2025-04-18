@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from flask import Flask
 from app.extensions import db
 from app.routes.auth_routes import auth_routes
@@ -10,6 +11,10 @@ from swagger_gen.swagger import Swagger
 import os
 
 def create_app():
+    load_dotenv(override=True)
+
+    print("Loaded DB URI:", os.getenv('DATABASE_URL'))
+
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": "*"}})
 

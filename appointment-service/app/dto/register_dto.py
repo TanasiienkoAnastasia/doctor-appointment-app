@@ -1,4 +1,4 @@
-from app.models.doctor_schedule import User
+from app.models import User
 from werkzeug.security import generate_password_hash
 
 class RegisterRequestDTO:
