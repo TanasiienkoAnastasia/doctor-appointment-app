@@ -37,6 +37,7 @@ def create_app():
     app.register_blueprint(user_routes, url_prefix='/user')
 
     with app.app_context():
+        db.drop_all()
         db.create_all()
 
     return app
