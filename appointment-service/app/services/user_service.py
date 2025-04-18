@@ -8,8 +8,3 @@ class UserService:
         if not user:
             return None
         return UserSchema().dump(user)
-
-    @staticmethod
-    def get_all_users():
-        users = User.query.all()
-        return UserSchema(many=True).dump(users)

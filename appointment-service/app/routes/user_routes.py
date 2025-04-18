@@ -13,8 +13,3 @@ def get_user(user_id):
         return error("Користувача не знайдено", status=404)
     return success(data=user_data)
 
-@jwt_required
-@user_routes.route('/users', methods=['GET'])
-def get_all_users():
-    user_list = UserService.get_all_users()
-    return success(data=user_list)

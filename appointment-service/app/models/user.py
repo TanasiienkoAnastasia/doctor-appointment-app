@@ -11,4 +11,3 @@ class User(db.Model):
 
     appointments_as_doctor = db.relationship('Appointment', foreign_keys='Appointment.doctor_id', backref='doctor', lazy=True)
     appointments_as_patient = db.relationship('Appointment', foreign_keys='Appointment.patient_id', backref='patient', lazy=True)
-    medical_records = db.relationship('MedicalRecord', backref='patient_user', lazy=True, foreign_keys='MedicalRecord.patient_id')
