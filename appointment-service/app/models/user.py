@@ -7,6 +7,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     user_type = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
+    specialty = db.Column(db.String(100), nullable=True)
 
     appointments_as_doctor = db.relationship('Appointment', foreign_keys='Appointment.doctor_id', backref='doctor', lazy=True)
     appointments_as_patient = db.relationship('Appointment', foreign_keys='Appointment.patient_id', backref='patient', lazy=True)
