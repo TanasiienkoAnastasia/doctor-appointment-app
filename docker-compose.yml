@@ -1,49 +1,6 @@
 version: '3.9'
 
 services:
-  auth-service:
-    build: ./auth-service
-    ports:
-      - "8000:8000"
-    environment:
-      - SECRET_KEY=supersecretkey
-      - DATABASE_URL=postgresql://postgres:postgres@auth-db:5432/authdb
-    depends_on:
-      - auth-db
-
-  auth-db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: authdb
-    ports:
-      - "5450:5432"
-    volumes:
-      - auth_data:/var/lib/postgresql/data
-
-  user-service:
-    build: ./user-service
-    ports:
-      - "8001:8001"
-    environment:
-      - USER_DATABASE_URL=postgresql://postgres:postgres@user-db:5432/userdb
-    depends_on:
-      - user-db
-
-  user-db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: userdb
-    ports:
-      - "5451:5432"
-    volumes:
-      - user_data:/var/lib/postgresql/data
-
   appointment-service:
     build: ./appointment-service
     ports:
@@ -65,70 +22,6 @@ services:
     volumes:
       - appointment_data:/var/lib/postgresql/data
 
-  medical-records-service:
-    build: ./medical-records-service
-    ports:
-      - "8003:8003"
-    environment:
-      - MEDICAL_DB_URL=postgresql://postgres:postgres@medical-db:5432/medicaldb
-    depends_on:
-      - medical-db
-
-  medical-db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: medicaldb
-    ports:
-      - "5453:5432"
-    volumes:
-      - medical_data:/var/lib/postgresql/data
-
-  schedule-service:
-    build: ./schedule-service
-    ports:
-      - "8004:8004"
-    environment:
-      - SCHEDULE_DB_URL=postgresql://postgres:postgres@schedule-db:5432/scheduledb
-    depends_on:
-      - schedule-db
-
-  schedule-db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: scheduledb
-    ports:
-      - "5454:5432"
-    volumes:
-      - schedule_data:/var/lib/postgresql/data
-
-  notification-service:
-    build: ./notification-service
-    ports:
-      - "8005:8005"
-    environment:
-      - NOTIFICATION_ENV=production  # Можеш змінити або доповнити
-
-  gateway-service:
-    build: ./gateway
-    ports:
-      - "8080:8080"
-    depends_on:
-      - auth-service
-      - user-service
-      - appointment-service
-      - medical-records-service
-      - schedule-service
-      - notification-service
-
 volumes:
-  auth_data:
-  user_data:
   appointment_data:
-  medical_data:
-  schedule_data:
+
