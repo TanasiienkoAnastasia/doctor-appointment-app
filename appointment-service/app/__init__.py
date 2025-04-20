@@ -3,6 +3,7 @@ from flask import Flask
 from app.extensions import db
 from app.routes.auth_routes import auth_routes
 from app.routes.appointment_routes import appointment_routes
+from app.routes.recommendation_routes import recommendation_routes
 from app.routes.doctor_routes import doctor_routes
 from app.routes.user_routes import user_routes
 from flask_cors import CORS
@@ -33,6 +34,7 @@ def create_app():
     app.register_blueprint(appointment_routes, url_prefix='/appointments')
     app.register_blueprint(user_routes, url_prefix='/user')
     app.register_blueprint(doctor_routes, url_prefix='/doctor')
+    app.register_blueprint(recommendation_routes)
 
     with app.app_context():
         db.drop_all()
