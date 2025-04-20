@@ -39,7 +39,8 @@ class AuthService:
         access_token = AuthService.generate_token({
             'email': user.email,
             'userName': user.username,
-            'userType': user.user_type
+            'userType': user.user_type,
+            'id': user.id
         }, access_exp)
 
         refresh_token = AuthService.generate_token({

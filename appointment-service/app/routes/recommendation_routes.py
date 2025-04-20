@@ -25,7 +25,7 @@ def get_doctor_recommendations():
 
     doctors = User.query.filter(
         User.user_type == 'doctor',
-        User.specialty.in_(specialties)
+        #User.specialty.in_(specialties) temporarily pass all doctors to frontend
     ).all()
 
     doctor_data = [
