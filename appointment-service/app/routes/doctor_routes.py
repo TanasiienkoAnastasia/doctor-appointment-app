@@ -1,18 +1,19 @@
-from flask import Blueprint, request
-from app.guards.jwt_required import jwt_required
+from flask import Blueprint
+from flask_jwt_extended import jwt_required, get_jwt
 from app.guards.role_required import role_required
-from app.utils.response_utils import success
-from app.services.doctor_service import DoctorService
+from app.utils import success
+from app.services import DoctorService
 from app.schemas import AppointmentSchema
 
 doctor_routes = Blueprint('doctor_routes', __name__)
 
-@jwt_required
 @role_required('doctor')
 @doctor_routes.route('/appointments', methods=['GET'])
+@jwt_required()
 def get_doctor_appointments():
-    user_payload = request.user
+    user_payload = get_jwt()
 
+    print(user_payload)
     doctor_email = user_payload.get('email')
     appointments = DoctorService.get_appointments_for_doctor(doctor_email)
 

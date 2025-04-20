@@ -1,13 +1,13 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from app.utils import success, error
 from app.schemas import CreateAppointmentSchema, AppointmentSchema
 from app.services import AppointmentService
-from app.guards.jwt_required import jwt_required
 
 patient_appointments_routes = Blueprint('appointment_routes', __name__)
 
-@jwt_required
+@jwt_required()
 @patient_appointments_routes.route('/patient/appointments', methods=['POST'])
 def create_appointment():
     schema = CreateAppointmentSchema()
@@ -19,13 +19,13 @@ def create_appointment():
     appointment = AppointmentService.create_appointment(data)
     return success("Прийом створено", AppointmentSchema().dump(appointment), status=201)
 
-@jwt_required
+@jwt_required()
 @patient_appointments_routes.route('/patient/appointments', methods=['GET'])
 def get_appointments():
     appointments = AppointmentService.get_all()
     return success(data=AppointmentSchema(many=True).dump(appointments))
 
-@jwt_required
+@jwt_required()
 @patient_appointments_routes.route('/patient/appointments/<int:appointment_id>', methods=['PUT'])
 def update_appointment(appointment_id):
     appointment = AppointmentService.get_by_id(appointment_id)
@@ -36,7 +36,7 @@ def update_appointment(appointment_id):
     appointment = AppointmentService.update_appointment(appointment, data)
     return success("Прийом оновлено", AppointmentSchema().dump(appointment))
 
-@jwt_required
+@jwt_required()
 @patient_appointments_routes.route('/patient/appointments/<int:appointment_id>', methods=['DELETE'])
 def delete_appointment(appointment_id):
     appointment = AppointmentService.get_by_id(appointment_id)

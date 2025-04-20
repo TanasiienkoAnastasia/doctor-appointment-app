@@ -1,14 +1,17 @@
+import os
 from dotenv import load_dotenv
 from flask import Flask
-from app.extensions import db
-from app.routes.auth_routes import auth_routes
-from app.routes.patient_appointments_routes import patient_appointments_routes
-from app.routes.recommendation_routes import recommendation_routes
-from app.routes.doctor_routes import doctor_routes
-from app.routes.user_routes import user_routes
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from app.extensions import db
+from app.routes import (
+    auth_routes,
+    doctor_routes,
+    patient_appointments_routes,
+    recommendation_routes,
+    user_routes
+)
 from swagger_gen.swagger import Swagger
-import os
 
 def create_app():
     load_dotenv(override=True)
@@ -23,6 +26,10 @@ def create_app():
         title='app'
     )
     swagger.configure()
+
+    app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_SECRET_KEY"] = os.getenv('SECRET_KEY', 'supersecretkey')
+    wt = JWTManager(app)
 
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'supersecretkey')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')

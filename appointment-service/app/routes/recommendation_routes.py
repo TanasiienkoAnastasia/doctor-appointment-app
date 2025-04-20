@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 from app.models import User
-from app.utils.response_utils import success, error
-from app.guards.jwt_required import jwt_required
+from app.utils import success, error
 
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
@@ -11,8 +11,8 @@ INJURY_SPECIALTIES = {
     'розтягнення': ['травматолог'],
 }
 
+@jwt_required()
 @recommendation_routes.route('/recommendations', methods=['GET'])
-@jwt_required
 def get_doctor_recommendations():
     injury = request.args.get('injury')
 

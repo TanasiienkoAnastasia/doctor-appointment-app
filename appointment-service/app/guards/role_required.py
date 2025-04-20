@@ -3,7 +3,6 @@ from functools import wraps
 import jwt
 from flask import request, jsonify
 
-
 def role_required(required_role):
     def decorator(f):
         @wraps(f)

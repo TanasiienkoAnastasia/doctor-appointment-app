@@ -1,6 +1,7 @@
 import datetime
 import jwt
 import os
+from flask_jwt_extended import create_access_token
 from werkzeug.security import check_password_hash
 from app.models.user import User
 from app.extensions import db
@@ -36,12 +37,12 @@ class AuthService:
         access_exp = datetime.timedelta(minutes=15)
         refresh_exp = datetime.timedelta(days=7)
 
-        access_token = AuthService.generate_token({
+        access_token = create_access_token(identity=user.email, expires_delta=access_exp, additional_claims={
             'email': user.email,
             'userName': user.username,
             'userType': user.user_type,
             'id': user.id
-        }, access_exp)
+        })
 
         refresh_token = AuthService.generate_token({
             'email': user.email,
