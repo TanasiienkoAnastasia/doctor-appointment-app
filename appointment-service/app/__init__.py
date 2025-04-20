@@ -37,7 +37,7 @@ def create_app():
     app.register_blueprint(recommendation_routes)
 
     with app.app_context():
-        db.drop_all()
+        # db.drop_all() Uncomment to drop db
         db.create_all()
 
     return app
