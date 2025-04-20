@@ -8,6 +8,7 @@ class RegisterRequestSchema(Schema):
     userType = fields.String(required=True, validate=validate.OneOf(["patient", "doctor"]))
     phone = fields.String(required=False, allow_none=True, validate=validate.Length(min=7, max=20))
     specialty = fields.String(required=False, allow_none=True, validate=validate.Length(min=2, max=100))
+    age = fields.Int(validate=validate.Range(min=0, max=120), allow_none=True)
 
     class Meta:
         ordered = True
