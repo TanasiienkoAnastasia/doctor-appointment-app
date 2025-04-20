@@ -31,7 +31,7 @@ def create_app():
     db.init_app(app)
 
     app.register_blueprint(auth_routes, url_prefix='/auth')
-    app.register_blueprint(patient_appointments_routes)
+    app.register_blueprint(patient_appointments_routes, strict_slashes=False)
     app.register_blueprint(user_routes, url_prefix='/user')
     app.register_blueprint(doctor_routes, url_prefix='/doctor')
     app.register_blueprint(recommendation_routes)

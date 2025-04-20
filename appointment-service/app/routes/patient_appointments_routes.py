@@ -8,7 +8,7 @@ from app.guards.jwt_required import jwt_required
 patient_appointments_routes = Blueprint('appointment_routes', __name__)
 
 @jwt_required
-@patient_appointments_routes.route('/patient/appointments/', methods=['POST'])
+@patient_appointments_routes.route('/patient/appointments', methods=['POST'])
 def create_appointment():
     schema = CreateAppointmentSchema()
     try:
@@ -20,7 +20,7 @@ def create_appointment():
     return success("Прийом створено", AppointmentSchema().dump(appointment), status=201)
 
 @jwt_required
-@patient_appointments_routes.route('/patient/appointments/', methods=['GET'])
+@patient_appointments_routes.route('/patient/appointments', methods=['GET'])
 def get_appointments():
     appointments = AppointmentService.get_all()
     return success(data=AppointmentSchema(many=True).dump(appointments))
