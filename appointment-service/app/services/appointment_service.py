@@ -17,9 +17,16 @@ class AppointmentService:
     def get_by_id(appointment_id):
         return Appointment.query.get(appointment_id)
 
+
     @staticmethod
     def update_appointment(appointment, data):
         appointment.status = data.get('status', appointment.status)
+        appointment.date = data.get('date', appointment.date)
+        appointment.time = data.get('time', appointment.time)
+        appointment.complaint = data.get('complaint', appointment.complaint)
+        appointment.comment = data.get('comment', appointment.comment)
+        appointment.doctor_id = data.get('doctor_id', appointment.doctor_id)
+        appointment.injury_type = data.get('injuryType', appointment.injury_type)
         db.session.commit()
         return appointment
 

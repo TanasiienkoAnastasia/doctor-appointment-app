@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from app.utils import success, error
 from app.schemas import CreateAppointmentSchema, AppointmentSchema
 from app.services import AppointmentService
+from flask import current_app
 
 patient_appointments_routes = Blueprint('appointment_routes', __name__)
 
@@ -32,9 +33,17 @@ def update_appointment(appointment_id):
     if not appointment:
         return error("Прийом не знайдено", status=404)
 
-    data = request.get_json()
-    appointment = AppointmentService.update_appointment(appointment, data)
-    return success("Прийом оновлено", AppointmentSchema().dump(appointment))
+    try:
+        data = request.get_json()
+        if not data:
+            return error("Невірний формат даних", status=400)
+        appointment = AppointmentService.update_appointment(appointment, data)
+        return success("Прийом оновлено", AppointmentSchema().dump(appointment))
+
+    except Exception as e:
+        current_app.logger.error(f"Помилка оновлення прийому {appointment_id}: {str(e)}")
+        return error("Сталася помилка під час оновлення", status=500)
+
 
 @jwt_required()
 @patient_appointments_routes.route('/patient/appointments/<int:appointment_id>', methods=['DELETE'])
