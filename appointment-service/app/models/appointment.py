@@ -8,3 +8,4 @@ class Appointment(db.Model):
     time = db.Column(db.Time, nullable=False)
     status = db.Column(db.String(50), nullable=False)
     complaint = db.Column(db.String(255), nullable=True)
+    comment = db.Column(db.Text, nullable=True)

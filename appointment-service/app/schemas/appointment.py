@@ -8,6 +8,7 @@ class CreateAppointmentSchema(Schema):
     time = fields.Time(required=True)
     complaint = fields.Str(required=True)
     status = fields.Str()
+    comment = fields.Str()
 
     class Meta:
         ordered = True
@@ -21,6 +22,7 @@ class AppointmentSchema(Schema):
     time = fields.Time()
     complaint = fields.Str()
     status = fields.Str()
+    comment = fields.Str()
 
     doctor = fields.Nested(UserSchema, only=("id", "username", "specialty"))
     patient = fields.Nested(UserSchema, only=("id", "username", "age"))
