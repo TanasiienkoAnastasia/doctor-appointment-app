@@ -7,7 +7,7 @@ class CreateAppointmentSchema(Schema):
     date = fields.Date(required=True)
     time = fields.Time(required=True)
     complaint = fields.Str(required=True)
-    status = fields.Str(missing='scheduled')
+    status = fields.Str()
 
     class Meta:
         ordered = True

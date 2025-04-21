@@ -1,5 +1,5 @@
 # appointment-service/requirements.txt
-flask
+flask~=3.1.0
 psycopg2-binary
 blinker==1.9.0
 click==8.1.8
@@ -21,8 +21,10 @@ flask_sqlalchemy
 pyjwt
 flask-cors
 werkzeug
-marshmallow
+marshmallow~=4.0.0
 flask-swagger==0.2.14
 flask-swagger-ui==4.11.1
 swagger-gen==0.1.2
-
+flask_jwt_extended
+psycopg[binary]
+python-dotenv~=1.1.0
