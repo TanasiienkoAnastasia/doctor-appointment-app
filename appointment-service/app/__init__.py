@@ -13,6 +13,9 @@ from app.routes import (
 )
 from swagger_gen.swagger import Swagger
 
+from app.routes.patient_routes import patient_blueprint
+
+
 def create_app():
     load_dotenv(override=True)
 
@@ -39,6 +42,7 @@ def create_app():
 
     app.register_blueprint(auth_routes, url_prefix='/auth')
     app.register_blueprint(patient_appointments_routes, strict_slashes=False)
+    app.register_blueprint(patient_blueprint, strict_slashes=False)
     app.register_blueprint(user_routes, url_prefix='/user')
     app.register_blueprint(doctor_routes, url_prefix='/doctor')
     app.register_blueprint(recommendation_routes)
