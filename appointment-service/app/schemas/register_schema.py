@@ -3,6 +3,8 @@ from app.dto.register_dto import RegisterRequestDTO
 
 class RegisterRequestSchema(Schema):
     name = fields.String(required=True, validate=validate.Length(min=2))
+    surname = fields.String(required=True, validate=validate.Length(min=2))
+    middleName = fields.String(required=True, validate=validate.Length(min=2))
     email = fields.Email(required=True)
     password = fields.String(required=True, validate=validate.Length(min=6))
     userType = fields.String(required=True, validate=validate.OneOf(["patient", "doctor"]))
@@ -15,4 +17,15 @@ class RegisterRequestSchema(Schema):
 
     @post_load
     def make_dto(self, data, **kwargs):
-        return RegisterRequestDTO(**data)
+        return RegisterRequestDTO(
+            name=data['name'],
+            surname=data['surname'],
+            middle_name=data['middleName'],
+            email=data['email'],
+            password=data['password'],
+            userType=data['userType'],
+            phone=data.get('phone'),
+            specialty=data.get('specialty'),
+            age=data.get('age')
+        )
+

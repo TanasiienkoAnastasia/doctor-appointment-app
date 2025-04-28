@@ -31,7 +31,9 @@ def get_doctor_recommendations():
     doctor_data = [
         {
             'id': d.id,
-            'name': d.username,
+            'name': d.name,
+            'surname': d.surname,
+            'middle_name': d.middle_name,
             'email': d.email,
             'specialty': d.specialty
         }

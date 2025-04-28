@@ -39,7 +39,9 @@ class AuthService:
 
         access_token = create_access_token(identity=user.email, expires_delta=access_exp, additional_claims={
             'email': user.email,
-            'userName': user.username,
+            'name': user.name,
+            'surname': user.surname,
+            'middle_name': user.middle_name,
             'userType': user.user_type,
             'id': user.id
         })

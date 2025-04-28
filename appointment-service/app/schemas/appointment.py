@@ -24,8 +24,8 @@ class AppointmentSchema(Schema):
     status = fields.Str()
     comment = fields.Str(required=False)
 
-    doctor = fields.Nested(UserSchema, only=("id", "username", "specialty"))
-    patient = fields.Nested(UserSchema, only=("id", "username", "age"))
+    doctor = fields.Nested(UserSchema, only=("id", "name", "surname", "middle_name", "specialty"))
+    patient = fields.Nested(UserSchema, only=("id", "name", "surname", "middle_name", "age"))
 
     class Meta:
         ordered = True
