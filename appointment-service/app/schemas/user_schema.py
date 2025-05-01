@@ -10,6 +10,7 @@ class UserSchema(Schema):
     phone = fields.Str(allow_none=True)
     specialty = fields.Str(allow_none=True)
     age = fields.Int(allow_none=True)
+    photo_url = fields.Str()
 
     class Meta:
         ordered = True

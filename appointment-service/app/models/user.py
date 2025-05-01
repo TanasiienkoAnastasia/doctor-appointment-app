@@ -13,8 +13,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), unique=True, nullable=True)
     specialty = db.Column(db.String(100), nullable=True)
     age = db.Column(db.Integer, nullable=True)
-
-
+    photo_url = db.Column(db.String(255), nullable=True)
 
     appointments_as_doctor = db.relationship(
         'Appointment',
