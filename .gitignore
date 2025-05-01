@@ -10,3 +10,5 @@ appointment-service/app/dto/__pycache__/
 appointment-service/app/guards/__pycache__/
 
 *.pyc
+
+appointment-service/app/static/uploads/
