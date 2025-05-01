@@ -1,8 +1,7 @@
+import uuid
 from flask import Blueprint, request, current_app
-from werkzeug.utils import secure_filename
 from marshmallow import ValidationError
 import os
-
 from app.schemas import LoginRequestSchema, RegisterRequestSchema, UserSchema
 from app.services.auth_service import AuthService
 from app.utils import success, error
@@ -17,7 +16,6 @@ auth_routes = Blueprint('auth_routes', __name__)
 )
 @auth_routes.route('/register', methods=['POST'])
 def register():
-    # Розпакування запиту (JSON або multipart/form-data)
     if request.content_type.startswith('multipart/form-data'):
         form_data = request.form.to_dict()
         photo_file = request.files.get('photo')
@@ -25,7 +23,6 @@ def register():
         form_data = request.get_json()
         photo_file = None
 
-    # Валідація
     schema = RegisterRequestSchema()
     try:
         dto = schema.load(form_data)
@@ -35,22 +32,21 @@ def register():
     if AuthService.is_email_taken(dto.email):
         return error("Користувач вже існує", status=400)
 
-    # Збереження фото, якщо є
     photo_url = None
     if photo_file and photo_file.filename:
+        file_extension = os.path.splitext(photo_file.filename)[1]
+        unique_filename = f"{uuid.uuid4().hex}{file_extension}"
+
         upload_path = os.path.join(current_app.root_path, 'static', 'uploads')
         os.makedirs(upload_path, exist_ok=True)
 
-        filename = secure_filename(photo_file.filename)
-        photo_path = os.path.join(upload_path, filename)
+        photo_path = os.path.join(upload_path, unique_filename)
         photo_file.save(photo_path)
 
-        photo_url = f'/static/uploads/{filename}'
+        photo_url = f'/static/uploads/{unique_filename}'
 
-    # Додаємо URL фото в DTO
     dto.photo_url = photo_url
 
-    # Реєстрація
     new_user = AuthService.register_user(dto)
     user_data = UserSchema().dump(new_user)
 
