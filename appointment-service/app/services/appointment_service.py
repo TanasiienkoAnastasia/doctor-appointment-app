@@ -1,5 +1,6 @@
 from app.extensions import db
-from app.models import Appointment
+from app.models import Appointment, User
+
 
 class AppointmentService:
     @staticmethod
@@ -10,8 +11,12 @@ class AppointmentService:
         return appointment
 
     @staticmethod
-    def get_all():
-        return Appointment.query.all()
+    def get_appointments_for_patient(email):
+        patient = User.query.filter_by(email=email).first()
+        if not patient:
+            return []
+
+        return Appointment.query.filter_by(patient_id=patient.id).all()
 
     @staticmethod
     def get_by_id(appointment_id):

@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 from marshmallow import ValidationError
 from app.utils import success, error
 from app.schemas import CreateAppointmentSchema, AppointmentSchema
@@ -17,13 +17,18 @@ def create_appointment():
     except ValidationError as err:
         return error("Помилка валідації", err.messages)
 
+    # TODO validate that current user id matches id in appointment that is being created
     appointment = AppointmentService.create_appointment(data)
     return success("Прийом створено", AppointmentSchema().dump(appointment), status=201)
 
-@jwt_required()
 @patient_appointments_routes.route('/patient/appointments', methods=['GET'])
+@jwt_required()
 def get_appointments():
-    appointments = AppointmentService.get_all()
+    user_payload = get_jwt()
+
+    print(user_payload)
+    patient_email = user_payload.get('email')
+    appointments = AppointmentService.get_appointments_for_patient(patient_email)
     return success(data=AppointmentSchema(many=True).dump(appointments))
 
 @jwt_required()

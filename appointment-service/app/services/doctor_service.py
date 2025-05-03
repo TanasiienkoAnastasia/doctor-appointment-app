@@ -7,3 +7,7 @@ class DoctorService:
         if not doctor:
             return []
         return Appointment.query.filter_by(doctor_id=doctor.id).all()
+
+    @staticmethod
+    def get_all_doctors():
+        return User.query.filter_by(user_type='doctor').all()
