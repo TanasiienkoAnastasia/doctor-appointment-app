@@ -1,7 +1,5 @@
-# app/routes/patient_routes.py
-
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Blueprint, jsonify
+from flask_jwt_extended import jwt_required, get_jwt
 from app.models import User
 
 patient_blueprint = Blueprint('patient', __name__)
@@ -9,8 +7,11 @@ patient_blueprint = Blueprint('patient', __name__)
 @patient_blueprint.route('/patient/profile', methods=['GET'])
 @jwt_required()
 def get_patient_profile():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    user_payload = get_jwt()
+
+    print(user_payload)
+    email = user_payload.get('email')
+    user = User.query.filter_by(email=email).first()
 
     if not user:
         return jsonify({"message": "Користувача не знайдено"}), 404
