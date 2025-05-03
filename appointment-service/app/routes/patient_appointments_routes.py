@@ -1,6 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt
 from marshmallow import ValidationError
+
+from app.guards.role_required import role_required
 from app.utils import success, error
 from app.schemas import CreateAppointmentSchema, AppointmentSchema
 from app.services import AppointmentService
@@ -8,8 +10,9 @@ from flask import current_app
 
 patient_appointments_routes = Blueprint('appointment_routes', __name__)
 
-@jwt_required()
+@role_required('patient')
 @patient_appointments_routes.route('/patient/appointments', methods=['POST'])
+@jwt_required()
 def create_appointment():
     schema = CreateAppointmentSchema()
     try:
@@ -17,7 +20,12 @@ def create_appointment():
     except ValidationError as err:
         return error("Помилка валідації", err.messages)
 
-    # TODO validate that current user id matches id in appointment that is being created
+    user_payload = get_jwt()
+    patient_id = user_payload.get('id')
+
+    if not patient_id or patient_id != data['patient_id']:
+        return error("Ви не можете створити прийом від імені іншого пацієнта", status=403)
+
     appointment = AppointmentService.create_appointment(data)
     return success("Прийом створено", AppointmentSchema().dump(appointment), status=201)
 
