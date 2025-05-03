@@ -14,14 +14,14 @@ INJURY_SPECIALTIES = {
 @jwt_required()
 @recommendation_routes.route('/recommendations', methods=['GET'])
 def get_doctor_recommendations():
-    injury = request.args.get('injury')
+    complaint = request.args.get('complaint')
 
-    if not injury:
-        return error("Параметр 'injury' обов'язковий", status=400)
+    if not complaint:
+        return error("Параметр 'complaint' обов'язковий", status=400)
 
-    specialties = INJURY_SPECIALTIES.get(injury.lower(), [])
-    if not specialties:
-        return success("Рекомендацій не знайдено", data=[])
+    # specialties = INJURY_SPECIALTIES.get(complaint.lower(), [])
+    # if not specialties:
+    #    return success("Рекомендацій не знайдено", data=[])
 
     doctors = User.query.filter(
         User.user_type == 'doctor',
