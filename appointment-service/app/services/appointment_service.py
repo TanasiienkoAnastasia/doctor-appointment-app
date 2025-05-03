@@ -31,7 +31,6 @@ class AppointmentService:
         appointment.complaint = data.get('complaint', appointment.complaint)
         appointment.comment = data.get('comment', appointment.comment)
         appointment.doctor_id = data.get('doctor_id', appointment.doctor_id)
-        appointment.injury_type = data.get('injuryType', appointment.injury_type)
         db.session.commit()
         return appointment
 
