@@ -38,17 +38,20 @@ def update_appointment(appointment_id):
     if not appointment:
         return error("Прийом не знайдено", status=404)
 
+    if appointment.status == 'скасовано':
+        return error("Неможливо редагувати скасований прийом", status=403)
+
     try:
         data = request.get_json()
         if not data:
             return error("Невірний формат даних", status=400)
+
         appointment = AppointmentService.update_appointment(appointment, data)
         return success("Прийом оновлено", AppointmentSchema().dump(appointment))
 
     except Exception as e:
         current_app.logger.error(f"Помилка оновлення прийому {appointment_id}: {str(e)}")
         return error("Сталася помилка під час оновлення", status=500)
-
 
 @jwt_required()
 @patient_appointments_routes.route('/patient/appointments/<int:appointment_id>', methods=['DELETE'])
