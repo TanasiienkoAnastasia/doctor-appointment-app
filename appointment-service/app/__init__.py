@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from app.extensions import db
@@ -12,9 +12,7 @@ from app.routes import (
     user_routes
 )
 from swagger_gen.swagger import Swagger
-
 from app.routes.patient_routes import patient_blueprint
-
 
 def create_app():
     load_dotenv(override=True)
@@ -23,6 +21,11 @@ def create_app():
 
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": "*"}})
+
+    @app.route('/static/uploads/<filename>')
+    def uploaded_file(filename):
+        upload_folder = os.path.join(app.root_path, 'static', 'uploads')
+        return send_from_directory(upload_folder, filename)
 
     swagger = Swagger(
         app=app,

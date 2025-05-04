@@ -30,7 +30,7 @@ def register():
         return error("Помилка валідації", err.messages, 400)
 
 
-    if AuthService.is_phone_taken(dto.phone):
+    if dto.phone is not None and AuthService.is_phone_taken(dto.phone):
         return error("Користувач вже існує", status=400)
 
     if AuthService.is_email_taken(dto.email):
