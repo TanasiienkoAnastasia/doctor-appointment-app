@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import timedelta, datetime, time
 
 from app.extensions import db
@@ -108,3 +109,40 @@ class AppointmentService:
     def delete_appointment(appointment):
         db.session.delete(appointment)
         db.session.commit()
+
+    @staticmethod
+    def get_available_slots_for_doctor(doctor_id):
+        today = datetime.today().date()
+        end_date = today + timedelta(days=30)
+        slot_duration = timedelta(minutes=30)
+        start_time = time(9, 0)
+        end_time = time(17, 30)
+
+        # Отримуємо всі призначення в межах наступних 30 днів
+        appointments = Appointment.query.filter(
+            Appointment.doctor_id == doctor_id,
+            Appointment.date >= today,
+            Appointment.date <= end_date,
+            Appointment.status != 'скасовано'
+        ).all()
+
+        # Створюємо словник зайнятих слотів за датами
+        busy = defaultdict(set)
+        for a in appointments:
+            busy[a.date].add(a.time)
+
+        # Підготовка вільних слотів
+        available = defaultdict(list)
+
+        for i in range(31):  # 0 до 30 включно
+            date = today + timedelta(days=i)
+            current = datetime.combine(date, start_time)
+            end = datetime.combine(date, end_time)
+
+            while current <= end:
+                slot_time = current.time()
+                if slot_time not in busy[date]:
+                    available[str(date)].append(slot_time.strftime('%H:%M'))
+                current += slot_duration
+
+        return available

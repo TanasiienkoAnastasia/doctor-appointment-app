@@ -67,3 +67,12 @@ def get_available_slots(doctor_id):
         current += step
 
     return success(data=slots)
+
+@doctor_routes.route('/<int:doctor_id>/slot-analytics', methods=['GET'])
+@jwt_required()
+def get_slot_analytics(doctor_id):
+    try:
+        data = DoctorService.get_popular_slots_and_availability(doctor_id)
+        return success(data=data)
+    except Exception as e:
+        return error(f"Не вдалося отримати аналітику: {str(e)}")
