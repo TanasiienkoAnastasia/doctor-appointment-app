@@ -1,4 +1,4 @@
-from datetime import time, timedelta, datetime
+from datetime import time, timedelta, datetime, date
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt
@@ -44,12 +44,16 @@ def get_available_slots(doctor_id):
     end = time(17, 30)
     step = timedelta(minutes=30)
 
+    now = datetime.now()
+    current_time_limit = now.time() if date_obj == date.today() else time(0, 0)
+
     slots = []
     current = datetime.combine(date_obj, start)
     end_dt = datetime.combine(date_obj, end)
 
     while current <= end_dt:
-        if current.time() not in busy_times:
+        slot_time = current.time()
+        if slot_time not in busy_times and slot_time >= current_time_limit:
             slots.append(current.strftime("%H:%M"))
         current += step
 
