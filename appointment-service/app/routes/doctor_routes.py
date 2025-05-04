@@ -37,8 +37,17 @@ def get_available_slots(doctor_id):
     except:
         return error("Невірний формат дати", status=400)
 
-    appointments = Appointment.query.filter_by(doctor_id=doctor_id, date=date_obj).all()
-    busy_times = {a.time for a in appointments}
+    appointments = Appointment.query.filter_by(
+        doctor_id=doctor_id,
+        date=date_obj
+    ).all()
+
+    busy_times = {
+        a.time for a in appointments
+        if a.status != 'скасовано'
+    }
+
+    print(busy_times)
 
     start = time(9, 0)
     end = time(17, 30)
