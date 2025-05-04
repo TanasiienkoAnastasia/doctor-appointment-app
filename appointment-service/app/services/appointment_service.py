@@ -8,34 +8,33 @@ class AppointmentService:
     @staticmethod
     def create_appointment(data):
         doctor_id = data["doctor_id"]
-        appointment_date = data["date"]
+        desired_date = data["date"]
         desired_time = data["time"]
-        duration = timedelta(minutes=30)
-
-        existing_appointments = Appointment.query.filter_by(
-            doctor_id=doctor_id,
-            date=appointment_date
-        ).order_by(Appointment.time).all()
-
-        busy_slots = set(a.time for a in existing_appointments)
 
         slots = AppointmentService.generate_time_slots(start=time(9, 0), end=time(17, 30), step_minutes=30)
 
-        available_time = None
-        for slot in slots:
-            if slot >= desired_time and slot not in busy_slots:
-                available_time = slot
-                break
+        for offset in range(0, 30):
+            current_date = desired_date + timedelta(days=offset)
+            existing_appointments = Appointment.query.filter_by(
+                doctor_id=doctor_id,
+                date=current_date
+            ).order_by(Appointment.time).all()
 
-        if not available_time:
-            raise ValueError("Немає доступних слотів для прийому цього дня")
+            busy_slots = set(a.time for a in existing_appointments)
 
-        data["time"] = available_time
+            for slot in slots:
+                if offset == 0 and slot < desired_time:
+                    continue
 
-        appointment = Appointment(**data)
-        db.session.add(appointment)
-        db.session.commit()
-        return appointment
+                if slot not in busy_slots:
+                    data["date"] = current_date
+                    data["time"] = slot
+                    appointment = Appointment(**data)
+                    db.session.add(appointment)
+                    db.session.commit()
+                    return appointment
+
+        raise ValueError("Немає вільних слотів у лікаря протягом наступних 30 днів")
 
     @staticmethod
     def generate_time_slots(start: time, end: time, step_minutes: int):
