@@ -61,6 +61,9 @@ def update_appointment(appointment_id):
         appointment = AppointmentService.update_appointment(appointment, data)
         return success("Прийом оновлено", AppointmentSchema().dump(appointment))
 
+    except ValueError as e:
+        return error(str(e), status=409)
+
     except Exception as e:
         current_app.logger.error(f"Помилка оновлення прийому {appointment_id}: {str(e)}")
         return error("Сталася помилка під час оновлення", status=500)

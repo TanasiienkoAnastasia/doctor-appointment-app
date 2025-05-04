@@ -70,15 +70,31 @@ class AppointmentService:
     def get_by_id(appointment_id):
         return Appointment.query.get(appointment_id)
 
-
     @staticmethod
     def update_appointment(appointment, data):
+        new_date = data.get('date', appointment.date)
+        new_time = data.get('time', appointment.time)
+        new_doctor_id = data.get('doctor_id', appointment.doctor_id)
+
+        conflict = Appointment.query.filter_by(
+            doctor_id=new_doctor_id,
+            date=new_date,
+            time=new_time
+        ).filter(
+            Appointment.id != appointment.id,
+            Appointment.status != 'скасовано'
+        ).first()
+
+        if conflict:
+            raise ValueError("Цей слот уже зайнятий у розкладі лікаря")
+
         appointment.status = data.get('status', appointment.status)
-        appointment.date = data.get('date', appointment.date)
-        appointment.time = data.get('time', appointment.time)
+        appointment.date = new_date
+        appointment.time = new_time
         appointment.complaint = data.get('complaint', appointment.complaint)
         appointment.comment = data.get('comment', appointment.comment)
-        appointment.doctor_id = data.get('doctor_id', appointment.doctor_id)
+        appointment.doctor_id = new_doctor_id
+
         db.session.commit()
         return appointment
 
