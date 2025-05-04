@@ -35,7 +35,7 @@ class AppointmentService:
                 date=current_date
             ).order_by(Appointment.time).all()
 
-            busy_slots = set(a.time for a in appointments)
+            busy_slots = set(a.time for a in appointments if a.status != 'скасовано')
 
             for slot in slots:
                 if offset == 0 and slot < start_time:
