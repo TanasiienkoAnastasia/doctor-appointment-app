@@ -26,7 +26,11 @@ def create_appointment():
     if not patient_id or patient_id != data['patient_id']:
         return error("Ви не можете створити прийом від імені іншого пацієнта", status=403)
 
-    appointment = AppointmentService.create_appointment(data)
+    try:
+        appointment = AppointmentService.create_appointment(data)
+    except ValueError as e:
+        return error(str(e), status=409)
+
     return success("Прийом створено", AppointmentSchema().dump(appointment), status=201)
 
 @patient_appointments_routes.route('/patient/appointments', methods=['GET'])
