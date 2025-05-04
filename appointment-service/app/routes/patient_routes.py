@@ -25,5 +25,6 @@ def get_patient_profile():
         "middle_name": user.middle_name,
         "specialty": user.specialty,
         "age": user.age,
-        "user_type": user.user_type
+        "user_type": user.user_type,
+        "photo_url": user.photo_url
     }), 200
