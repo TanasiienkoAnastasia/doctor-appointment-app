@@ -29,6 +29,10 @@ def register():
     except ValidationError as err:
         return error("Помилка валідації", err.messages, 400)
 
+
+    if AuthService.is_phone_taken(dto.phone):
+        return error("Користувач вже існує", status=400)
+
     if AuthService.is_email_taken(dto.email):
         return error("Користувач вже існує", status=400)
 

@@ -19,6 +19,10 @@ class AuthService:
         return User.query.filter_by(email=email).first() is not None
 
     @staticmethod
+    def is_phone_taken(phone):
+        return User.query.filter_by(phone=phone).first() is not None
+
+    @staticmethod
     def register_user(dto):
         new_user = dto.to_model()
         db.session.add(new_user)
