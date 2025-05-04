@@ -73,7 +73,13 @@ class AppointmentService:
     @staticmethod
     def update_appointment(appointment, data):
         new_date = data.get('date', appointment.date)
+        if isinstance(new_date, str):
+            new_date = datetime.strptime(new_date, "%Y-%m-%d").date()
+
         new_time = data.get('time', appointment.time)
+        if isinstance(new_time, str):
+            new_time = datetime.strptime(new_time, "%H:%M").time()
+
         new_doctor_id = data.get('doctor_id', appointment.doctor_id)
 
         conflict = Appointment.query.filter_by(
