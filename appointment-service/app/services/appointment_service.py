@@ -11,28 +11,38 @@ class AppointmentService:
         desired_date = data["date"]
         desired_time = data["time"]
 
+        next_date, next_time = AppointmentService.find_next_available_slot(doctor_id, desired_date, desired_time)
+
+        data["date"] = next_date
+        data["time"] = next_time
+
+        appointment = Appointment(**data)
+        db.session.add(appointment)
+        db.session.commit()
+        return appointment
+
+    @staticmethod
+    def find_next_available_slot(doctor_id, start_date, start_time):
+        max_days_ahead = 30
+        duration = timedelta(minutes=30)
         slots = AppointmentService.generate_time_slots(start=time(9, 0), end=time(17, 30), step_minutes=30)
 
-        for offset in range(0, 30):
-            current_date = desired_date + timedelta(days=offset)
-            existing_appointments = Appointment.query.filter_by(
+        for offset in range(max_days_ahead):
+            current_date = start_date + timedelta(days=offset)
+
+            appointments = Appointment.query.filter_by(
                 doctor_id=doctor_id,
                 date=current_date
             ).order_by(Appointment.time).all()
 
-            busy_slots = set(a.time for a in existing_appointments)
+            busy_slots = set(a.time for a in appointments)
 
             for slot in slots:
-                if offset == 0 and slot < desired_time:
+                if offset == 0 and slot < start_time:
                     continue
 
                 if slot not in busy_slots:
-                    data["date"] = current_date
-                    data["time"] = slot
-                    appointment = Appointment(**data)
-                    db.session.add(appointment)
-                    db.session.commit()
-                    return appointment
+                    return current_date, slot
 
         raise ValueError("Немає вільних слотів у лікаря протягом наступних 30 днів")
 
