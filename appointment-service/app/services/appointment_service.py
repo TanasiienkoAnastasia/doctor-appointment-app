@@ -152,3 +152,9 @@ class AppointmentService:
                 current += slot_duration
 
         return available
+
+    @staticmethod
+    def update_medical_data(appointment, new_data: str):
+        appointment.medical_data = new_data
+        db.session.commit()
+        return appointment

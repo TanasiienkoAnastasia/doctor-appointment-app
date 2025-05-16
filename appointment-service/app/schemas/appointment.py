@@ -9,6 +9,7 @@ class CreateAppointmentSchema(Schema):
     complaint = fields.Str(required=True)
     status = fields.Str(validate=validate.OneOf(["scheduled", "пішно", "запізнення"]))
     comment = fields.Str(required=False)
+    medical_data = fields.Str(required=False)  # 🔹 нове поле
 
     class Meta:
         ordered = True
@@ -23,6 +24,7 @@ class AppointmentSchema(Schema):
     complaint = fields.Str()
     status = fields.Str(validate=validate.OneOf(["scheduled", "пішно", "запізнення"]))
     comment = fields.Str(required=False)
+    medical_data = fields.Str(required=False)  # 🔹 нове поле
 
     doctor = fields.Nested(UserSchema, only=("id", "name", "surname", "middle_name", "specialty", "phone"))
     patient = fields.Nested(UserSchema, only=("id", "name", "surname", "middle_name", "age", "phone"))

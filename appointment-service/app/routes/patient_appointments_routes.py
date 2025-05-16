@@ -99,3 +99,25 @@ def delete_appointment(appointment_id):
 
     AppointmentService.delete_appointment(appointment)
     return success("Прийом видалено")
+
+
+@patient_appointments_routes.route('/doctor/appointments/<int:appointment_id>/medical-data', methods=['PATCH'])
+@jwt_required()
+@role_required('doctor')
+def update_medical_data(appointment_id):
+    appointment = AppointmentService.get_by_id(appointment_id)
+    if not appointment:
+        return error("Прийом не знайдено", status=404)
+
+    try:
+        data = request.get_json()
+        if not data or 'medical_data' not in data:
+            return error("Поле 'medical_data' обовʼязкове", status=400)
+
+        appointment = AppointmentService.update_medical_data(appointment, data['medical_data'])
+        return success("Оновлено", AppointmentSchema().dump(appointment))
+
+    except Exception as e:
+        current_app.logger.error(f"[PATCH /medical-data] {str(e)}")
+        return error("Внутрішня помилка сервера", status=500)
+

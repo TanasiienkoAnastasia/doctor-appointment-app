@@ -10,6 +10,7 @@ class Appointment(db.Model):
     status = db.Column(db.String(50), nullable=False)
     complaint = db.Column(db.String(255), nullable=True)
     comment = db.Column(db.Text, nullable=True)
+    medical_data = db.Column(db.Text, nullable=True)  # ✅ нове поле
 
     __table_args__ = (
         CheckConstraint(
