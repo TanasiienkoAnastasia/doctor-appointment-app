@@ -1,4 +1,5 @@
 from app.extensions import db
+from sqlalchemy import CheckConstraint
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,3 +10,10 @@ class Appointment(db.Model):
     status = db.Column(db.String(50), nullable=False)
     complaint = db.Column(db.String(255), nullable=True)
     comment = db.Column(db.Text, nullable=True)
+
+    __table_args__ = (
+        CheckConstraint(
+            status.in_(['scheduled', 'пішно', 'запізнення']),
+            name='check_valid_status'
+        ),
+    )

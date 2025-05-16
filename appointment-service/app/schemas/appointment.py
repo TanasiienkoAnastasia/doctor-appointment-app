@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 from app.schemas.user_schema import UserSchema
 
 class CreateAppointmentSchema(Schema):
@@ -7,7 +7,7 @@ class CreateAppointmentSchema(Schema):
     date = fields.Date(required=True)
     time = fields.Time(required=True)
     complaint = fields.Str(required=True)
-    status = fields.Str()
+    status = fields.Str(validate=validate.OneOf(["scheduled", "пішно", "запізнення"]))
     comment = fields.Str(required=False)
 
     class Meta:
@@ -21,7 +21,7 @@ class AppointmentSchema(Schema):
     date = fields.Date()
     time = fields.Time()
     complaint = fields.Str()
-    status = fields.Str()
+    status = fields.Str(validate=validate.OneOf(["scheduled", "пішно", "запізнення"]))
     comment = fields.Str(required=False)
 
     doctor = fields.Nested(UserSchema, only=("id", "name", "surname", "middle_name", "specialty", "phone"))

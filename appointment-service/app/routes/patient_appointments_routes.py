@@ -69,6 +69,28 @@ def update_appointment(appointment_id):
         return error("Сталася помилка під час оновлення", status=500)
 
 @jwt_required()
+@role_required('doctor')
+@patient_appointments_routes.route('/doctor/appointments/<int:appointment_id>/status', methods=['PATCH'])
+def update_appointment_status(appointment_id):
+    appointment = AppointmentService.get_by_id(appointment_id)
+    if not appointment:
+        return error("Прийом не знайдено", status=404)
+
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+
+        if new_status not in ['упішно', 'запізнення']:
+            return error("Недійсний статус", status=400)
+
+        appointment = AppointmentService.update_status(appointment, new_status)
+        return success("Статус оновлено", AppointmentSchema().dump(appointment))
+
+    except Exception as e:
+        current_app.logger.error(f"Помилка при оновленні статусу {appointment_id}: {str(e)}")
+        return error("Не вдалося оновити статус", status=500)
+
+@jwt_required()
 @patient_appointments_routes.route('/patient/appointments/<int:appointment_id>', methods=['DELETE'])
 def delete_appointment(appointment_id):
     appointment = AppointmentService.get_by_id(appointment_id)

@@ -111,6 +111,12 @@ class AppointmentService:
         db.session.commit()
 
     @staticmethod
+    def update_status(appointment, new_status):
+        appointment.status = new_status
+        db.session.commit()
+        return appointment
+
+    @staticmethod
     def get_available_slots_for_doctor(doctor_id):
         today = datetime.today().date()
         end_date = today + timedelta(days=30)
