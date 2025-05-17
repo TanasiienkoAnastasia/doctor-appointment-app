@@ -80,7 +80,7 @@ def update_appointment_status(appointment_id):
         data = request.get_json()
         new_status = data.get('status')
 
-        if new_status not in ['упішно', 'запізнення']:
+        if new_status not in ['успішно', 'запізнення']:
             return error("Недійсний статус", status=400)
 
         appointment = AppointmentService.update_status(appointment, new_status)
